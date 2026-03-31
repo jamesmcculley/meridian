@@ -12,14 +12,16 @@ sinks:
   quickwit_out:
     type: http
     inputs: [fluent_in]
-    uri: https://nginx:7280/api/v1/meridian-logs/ingest
+    uri: https://nginx:7280/api/v1/otel-logs-v0_7/ingest
     encoding:
       codec: json
     tls:
       ca_file: /certs/rootCA.pem
+      verify_hostname: false
     request:
       headers:
         content-type: application/json
+        host: quickwit.meridian.local
     buffer:
       type: disk
       max_size: 268435488
