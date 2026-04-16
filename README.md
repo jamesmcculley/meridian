@@ -1,6 +1,6 @@
 # Meridian Software — SRE Platform
 
-A portfolio-grade SRE platform built to production standards. Meridian Software's primary product is **StageGrid** — a live events ticketing platform — running across a multi-cloud, multi-cluster Kubernetes environment with full observability, security, and identity management.
+A portfolio-grade observability and security platform built to production standards. Meridian Software's primary product is **StageGrid** — a live events ticketing platform. The Meridian Platform is the SRE layer that runs it: a multi-cloud architecture with each cloud assigned a specific job, built incrementally from a working on-premises foundation.
 
 > Built by [James McCulley](https://jamesmcculley.dev) — Senior SRE  
 > GitHub: [github.com/jamesmcculley](https://github.com/jamesmcculley)
@@ -19,15 +19,16 @@ StageGrid's traffic profile — sharp on-sale spikes, high checkout criticality,
 
 **Meridian Software** is the fictional company. **StageGrid** is the product — a live events ticketing and infrastructure platform. The Meridian Platform is the SRE layer that runs it.
 
+The architecture assigns each cloud a specific job rather than duplicating infrastructure across providers. The on-premises stack is the working foundation today; cloud planes are being added in phases.
+
 ### Infrastructure
 
-| Cluster | Provider | Runtime | Role |
+| Environment | Provider | Runtime | Status |
 |---|---|---|---|
-| meridian-onprem | On-premises (MacBook Pro) | k3s / OrbStack | FreeIPA, Vault, dev workloads |
-| meridian-aws | AWS | EKS | Primary StageGrid production workloads |
-| meridian-azure | Azure | AKS | Secondary region, DR, chaos targets |
-
-Clusters are connected via **Tailscale** mesh VPN. **Linkerd** provides mTLS and traffic observability within each cluster.
+| meridian-onprem | On-premises | docker-compose | Running — current foundation |
+| meridian-aws | AWS | k3s on EC2 t3.micro | Planned — security plane |
+| meridian-gcp | GCP | k3s on e2-micro | Planned — observability plane |
+| meridian-azure | Azure | k3s on B1s | Planned — identity / GitOps plane |
 
 ### StageGrid Services
 
@@ -43,53 +44,43 @@ StageGrid's service architecture covers five bounded domains. The first service 
 
 ### Observability Stack
 
-| Pillar | Tool |
-|---|---|
-| Metrics | VictoriaMetrics |
-| Logs | Quickwit |
-| Traces | Jaeger |
-| Collection | Fluent Bit + Vector |
-| Instrumentation | OpenTelemetry |
+| Pillar | Tool | Status |
+|---|---|---|
+| Metrics | VictoriaMetrics | Running |
+| Logs | Quickwit | Running |
+| Traces | Jaeger | Planned |
+| Collection | Fluent Bit + Vector | Running |
+| Dashboards | Grafana | Planned (GCP plane) |
+| Instrumentation | OpenTelemetry | Planned |
 
 ### Security Stack
 
-- **Falco** (eBPF) — runtime syscall monitoring and anomaly detection
-- **OPA / Gatekeeper** — Kubernetes admission control policies
-- **Trivy** — container image vulnerability scanning in the ArgoCD pipeline
-- **HashiCorp Vault** — secrets management, PKI, short-lived credentials
-- **Linkerd mTLS** — encrypted, authenticated service-to-service communication
-
-### Identity & Access Management
-
-A layered identity model separating end-user, operator, and platform identity planes:
-
-| Layer | Provider | Scope |
+| Component | Purpose | Status |
 |---|---|---|
-| End users | Okta OIDC | StageGrid fan authentication |
-| Operators | Okta OIDC / SAML | Internal admin portal |
-| Unix / infrastructure | FreeIPA | SSH, sudo, host enrollment, LDAP |
-| Secrets | HashiCorp Vault | Service credentials, PKI, TLS |
-
-FreeIPA provides centralized Unix identity management for all on-premises infrastructure — host enrollment, SSH key management, sudo policy via HBAC rules, and LDAP directory services. This is the on-prem analog to enterprise PAM platforms (Delinea Server Suite, Centrify AD Bridging).
+| HashiCorp Vault | Secrets management, PKI, short-lived credentials | Running |
+| Falco (eBPF) | Runtime syscall monitoring and anomaly detection | Planned |
+| OPA / Gatekeeper | Kubernetes admission control policies | Planned |
+| Trivy | Container image vulnerability scanning in CI | Planned |
+| Linkerd mTLS | Encrypted, authenticated service-to-service communication | Planned |
 
 ### GitOps & Deployment
 
-**ArgoCD** manages all cluster state. Every manifest, Helm values file, and OPA policy is version-controlled in this repository. No manual kubectl applies in production.
+All manifests and Helm values are version-controlled in this repository. ArgoCD is the planned GitOps control plane (App of Apps pattern); it is not yet deployed.
 
 ---
 
 ## Python Tooling
 
-All platform tooling is written in Python, built without AI assistance, and lives in `/tools`.
+Platform tooling is written in Python and lives in `tools/`. Only `meridian-core` is implemented; the remaining tools are planned.
 
-| Tool | Description |
-|---|---|
-| `meridian-core` | Shared library: config, logging, Vault client, service discovery |
-| `logparse` | Log parsing and structured event extraction from Quickwit |
-| `py-exporter` | Custom VictoriaMetrics exporter for StageGrid business metrics |
-| `alert-router` | Alert routing and enrichment; integrates with VictoriaMetrics alertmanager |
-| `atlas-ops` | Operational automation: node drain, certificate rotation, chaos experiments |
-| `canary-analyzer` | Automated canary analysis using VictoriaMetrics metrics |
+| Tool | Description | Status |
+|---|---|---|
+| `meridian-core` | Shared library: config, Vault client, service discovery | Implemented |
+| `logparse` | Log parsing and structured event extraction from Quickwit | Planned |
+| `py-exporter` | Custom VictoriaMetrics exporter for StageGrid business metrics | Planned |
+| `alert-router` | Alert routing and enrichment | Planned |
+| `atlas-ops` | Operational automation: node drain, certificate rotation | Planned |
+| `canary-analyzer` | Automated canary analysis using VictoriaMetrics metrics | Planned |
 
 ---
 
@@ -98,30 +89,32 @@ All platform tooling is written in Python, built without AI assistance, and live
 ```
 /
 ├── README.md
-├── OPERATIONS.md          # Internal — operational runbooks and procedures
-├── TROUBLESHOOTING.md     # Internal — break/fix patterns and known issues
-├── platform/              # Shared infrastructure: ArgoCD, Vault, Linkerd, Tailscale
-├── clusters/              # Per-cluster Helm values and kustomize overlays
-│   ├── onprem/
-│   ├── aws/
-│   └── azure/
-├── services/              # StageGrid microservices
-│   ├── stagegrid-tickets/
-│   ├── stagegrid-catalog/
-│   ├── stagegrid-notify/
-│   ├── stagegrid-identity/
-│   └── stagegrid-loadgen/
-├── identity/              # FreeIPA manifests, Ansible host enrollment, Okta config
-├── observability/         # VictoriaMetrics, Quickwit, Jaeger, Fluent Bit, Vector
-├── security/              # Falco rules, OPA policies, Trivy pipeline config
-└── tools/                 # Python tooling ecosystem
+├── STRUCTURE.md           # Detailed directory and file reference
+├── CHANGELOG.md
+├── aws/
+│   └── vault/config/      # Vault server config for AWS plane
+├── onprem/
+│   ├── docker-compose.yml # On-prem stack: Vault, VictoriaMetrics, Quickwit, Nginx, MongoDB
+│   ├── nginx/             # TLS reverse proxy config
+│   ├── node-exporter/     # Node Exporter TLS config
+│   └── vault/config/      # Vault server config for on-prem
+├── observability/
+│   ├── victoriametrics/   # Scrape config
+│   ├── quickwit/          # Index and ingest config
+│   └── otel/              # Fluent Bit and Vector pipeline configs
+├── security/
+│   └── README.md          # Security tooling overview
+├── gitops/
+│   └── helm/meridian-chart/ # Helm chart scaffold
+└── tools/
+    └── meridian-core/     # Core Python library — implemented
 ```
 
 ---
 
 ## SLO Design
 
-SLOs are defined for each StageGrid service and tracked in VictoriaMetrics. Burn rate alerting fires at 1-hour and 6-hour windows.
+SLO targets are defined for each StageGrid service. Once services are deployed, burn rate alerting will fire at 1-hour and 6-hour windows tracked in VictoriaMetrics.
 
 | Service | Target | 30-Day Error Budget |
 |---|---|---|
@@ -132,10 +125,10 @@ SLOs are defined for each StageGrid service and tracked in VictoriaMetrics. Burn
 
 ---
 
-## Compliance
+## Compliance Design Targets
 
-- **PCI-DSS** — stagegrid-tickets is PCI-scoped. Vault manages credentials with short-lived leases and full audit logging. Network policies isolate PCI workloads to dedicated namespaces.
-- **SOC2 Type II** — Access control, audit logging, and change management controls mapped across the platform.
+- **PCI-DSS** — stagegrid-tickets will be PCI-scoped. Vault is designed to manage credentials with short-lived leases and full audit logging. Network policies will isolate PCI workloads to dedicated namespaces.
+- **SOC2 Type II** — Access control, audit logging, and change management controls are mapped to ArgoCD (change management) and Vault (access control); implementation follows service deployment.
 
 ---
 
