@@ -148,23 +148,35 @@ SLOs are defined for each StageGrid service and tracked in VictoriaMetrics. Burn
 
 > Last updated: April 2026
 
-### ✅ Running
+### Running
+
+All services below run via docker-compose in the `onprem/` configuration with TLS throughout.
+
 - **Vault** — initialized and unsealed (Shamir unseal, file storage backend); KMS auto-unseal planned
 - **VictoriaMetrics** — deployed, ingesting metrics via Node Exporter
 - **Quickwit** — deployed for log indexing
-- **Vector / Fluent Bit** — log pipeline configured
-- **Nginx** — reverse proxy in place
-- **MongoDB** — running on EC2
+- **Vector / Fluent Bit** — log collection and shipping pipeline configured end-to-end
+- **Nginx** — TLS reverse proxy
+- **MongoDB** — running via docker-compose
 
-### 🔧 In Progress
-- Falco (runtime security) — deploying
-- ArgoCD (GitOps) — configuring on Azure
-- Linkerd (service mesh) — planned
+### Roadmap
 
-### ☁️ Planes
-| Plane | Cloud | Role |
+The following are planned but not yet deployed:
+
+- **GCP observability plane** — migrate VictoriaMetrics, Quickwit, and Grafana to a GCP e2-micro (permanently free tier); next active work item
+- **Falco** — eBPF runtime security monitoring
+- **OPA/Gatekeeper** — Kubernetes admission control policies
+- **ArgoCD** — GitOps control plane, App of Apps pattern
+- **Linkerd** — service mesh with mTLS across all services
+- **KMS auto-unseal** — Vault auto-unseal via AWS KMS, eliminating manual operator unseal
+
+### Intended Architecture
+
+The table below describes the target multi-cloud placement. It is an architecture target, not a description of current state.
+
+| Plane | Cloud | Intended components |
 |---|---|---|
-| Security | AWS | Vault, Falco, GuardDuty, OPA |
+| Security | AWS | Vault (KMS auto-unseal), Falco, GuardDuty, OPA |
 | Observability | GCP | VictoriaMetrics, Quickwit, Grafana |
-| Identity/GitOps | Azure | Entra ID, ArgoCD, Linkerd |
-| Edge | On-prem k3s | Legacy baseline simulation |
+| Identity / GitOps | Azure | Entra ID, ArgoCD, Linkerd |
+| Edge / dev | On-prem | docker-compose stack (current), k3s (planned) |
