@@ -149,7 +149,7 @@ SLOs are defined for each StageGrid service and tracked in VictoriaMetrics. Burn
 > Last updated: April 2026
 
 ### ✅ Running
-- **Vault** — initialized and unsealed (AWS KMS auto-unseal), accessible on 
+- **Vault** — initialized and unsealed (Shamir unseal, file storage backend); KMS auto-unseal planned
 - **VictoriaMetrics** — deployed, ingesting metrics via Node Exporter
 - **Quickwit** — deployed for log indexing
 - **Vector / Fluent Bit** — log pipeline configured
