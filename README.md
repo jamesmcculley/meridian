@@ -46,7 +46,7 @@ Network architecture is a first-class concern, not an afterthought.
 ### Identity & Access Management
 
 - **Workload identity** — no long-lived credentials anywhere. AWS IRSA for pod-level IAM, GCP Workload Identity for service accounts
-- **Secrets management** — HashiCorp Vault with AWS KMS auto-unseal, short-lived dynamic credentials for database and cloud API access
+- **Secrets management** — HashiCorp Vault with short-lived dynamic credentials for database and cloud API access (Shamir unseal / file storage currently; AWS KMS auto-unseal planned for cloud migration)
 - **Service mesh identity** — Linkerd mTLS provides cryptographic service identity without managing certificates manually
 - **RBAC** — Kubernetes RBAC + OPA/Gatekeeper policies enforcing namespace isolation, image provenance, and resource constraints
 - **Human access** — break-glass procedures documented, no standing admin access to production namespaces
@@ -55,8 +55,8 @@ Network architecture is a first-class concern, not an afterthought.
 
 | Layer | Tool | What It Does |
 |---|---|---|
-| Runtime threat detection | Falco (eBPF) | Detects anomalous syscalls, container escapes, unexpected network connections |
-| Policy enforcement | OPA / Gatekeeper | Blocks non-compliant deployments (unsigned images, privilege escalation, missing labels) |
+| Runtime threat detection | Falco (eBPF) | Detects anomalous syscalls, container escapes, unexpected network connections — rules in [jamesmcculley/security-tools](https://github.com/jamesmcculley/security-tools) |
+| Policy enforcement | OPA / Gatekeeper | Blocks non-compliant deployments (unsigned images, privilege escalation, missing labels) — policies in [jamesmcculley/security-tools](https://github.com/jamesmcculley/security-tools) |
 | Vulnerability scanning | Trivy | Container image CVE scanning in CI and on-cluster admission |
 | Cloud threat detection | GuardDuty | AWS-native detection for compromised credentials, crypto mining, recon activity |
 | Cloud posture | Security Hub | Aggregated compliance findings across AWS accounts |
@@ -70,7 +70,7 @@ Observability feeds security. Anomaly detection, audit trails, and incident resp
 |---|---|---|
 | Metrics | VictoriaMetrics | Prometheus-compatible, lower resource footprint |
 | Logs | Quickwit | Columnar log search, cost-efficient at scale |
-| Traces | Jaeger | Distributed tracing for cross-service request flows |
+| Traces | Jaeger | Distributed tracing for cross-service request flows — planned |
 | Collection | OpenTelemetry + Fluent Bit + Vector | OTel for traces/metrics, Fluent Bit for node logs, Vector for routing and enrichment |
 | Dashboards | Grafana | Unified view across all signal types |
 
@@ -111,7 +111,7 @@ Additional compliance design targets:
 
 ## Python Tooling
 
-Platform tooling lives in `tools/`. Written in Python with type hints, Pydantic models, and async where appropriate.
+Platform tooling lives in `tools/`. Written in Python with type hints and async where appropriate.
 
 | Tool | Description | Status |
 |---|---|---|
@@ -134,46 +134,41 @@ Platform tooling lives in `tools/`. Written in Python with type hints, Pydantic 
 ## Repository Structure
 
 ```
-/
-├── README.md
-├── CHANGELOG.md
-├── terraform/
-│   ├── aws/              # VPCs, IAM, KMS, GuardDuty, Security Hub
-│   └── gcp/              # VPCs, firewall rules, Cloud Armor, Workload Identity
-├── k8s/                   # Kubernetes manifests
-├── security/
-│   ├── falco/            # Runtime detection rules
-│   ├── opa/              # Gatekeeper constraint templates
-│   └── trivy/            # Scanning configs and CI integration
+meridian/
+├── .github/
+│   └── workflows/
+│       ├── build-sign.yml          # Container build + Cosign keyless signing
+│       ├── lint.yml                # Ruff linting for tools/
+│       └── validate-manifests.yml  # YAML validation for all manifests
+├── aws/
+│   └── vault/
+│       └── config/vault.hcl        # Vault server config for AWS plane (planned)
 ├── observability/
-│   ├── victoriametrics/  # Scrape and retention config
-│   ├── quickwit/         # Index and ingest config
-│   ├── jaeger/           # Trace collection config
-│   └── otel/             # Fluent Bit and Vector pipeline configs
-├── networking/
-│   ├── wireguard/        # Cross-cloud mesh configs
-│   ├── calico/           # Network policies
-│   └── waf/              # Cloud Armor / AWS WAF rules
+│   ├── victoriametrics/
+│   │   └── prometheus.yml          # VictoriaMetrics scrape config
+│   ├── quickwit/
+│   │   └── quickwit.yaml           # Quickwit index and ingest config
+│   └── otel/
+│       ├── fluent-bit.conf         # Fluent Bit log forwarding config
+│       └── vector.yaml             # Vector pipeline config
+├── onprem/
+│   ├── docker-compose.yml          # On-prem stack: Vault, VictoriaMetrics, Quickwit, Nginx, MongoDB
+│   ├── nginx/nginx.conf            # TLS reverse proxy config
+│   ├── node-exporter/web.yml       # Node Exporter TLS config
+│   └── vault/config/vault.hcl     # Vault server config for on-prem
+├── security/
+│   └── README.md                   # Security tooling overview (Falco/OPA in security-tools repo)
 ├── gitops/
-│   ├── argocd/           # App of Apps definitions
-│   └── helm/             # Helm chart scaffolds
+│   └── helm/
+│       └── meridian-chart/         # Helm chart scaffold
 ├── tools/
-│   ├── meridian-core/    # Core Python library (implemented)
-│   ├── alert-router/     # Alert routing and enrichment
-│   ├── canary-analyzer/  # Deployment canary analysis
-│   └── flow-analyzer/    # VPC Flow Log anomaly detection
-├── compliance/
-│   └── nist-800-53-mapping.md
-├── docs/
-│   ├── ARCHITECTURE.md
-│   ├── THREAT-MODEL.md
-│   └── RUNBOOKS.md
-└── onprem/               # Local dev environment (docker-compose)
-    ├── docker-compose.yml
-    ├── nginx/
-    ├── node-exporter/
-    └── vault/config/
+│   └── meridian-core/              # Core Python library — config, Vault client, service discovery
+├── README.md
+├── STRUCTURE.md                    # Authoritative directory inventory
+└── CHANGELOG.md
 ```
+
+See [STRUCTURE.md](./STRUCTURE.md) for the authoritative directory inventory.
 
 ---
 
