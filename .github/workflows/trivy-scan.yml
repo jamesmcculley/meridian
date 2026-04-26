@@ -13,7 +13,7 @@ jobs:
     name: Filesystem scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Run filesystem scan
         uses: aquasecurity/trivy-action@v0.36.0
@@ -37,7 +37,7 @@ jobs:
     name: Image scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       # build-sign.yml only triggers on main pushes to tools/meridian-core/ — so on most PRs
       # there's no new image to scan. Scanning :latest keeps us honest between builds.
@@ -67,7 +67,7 @@ jobs:
     name: Config scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Run config scan
         uses: aquasecurity/trivy-action@v0.36.0
