@@ -26,8 +26,8 @@ Implemented or configured:
 - Quickwit configuration for searchable event storage.
 - Vector and Fluent Bit configuration that can support event routing.
 - Docker Compose lab services from the previous platform iteration.
-- A small Python package, `meridian-core`, currently limited to configuration
-  diagnostics.
+- A small Python package, `meridian-detect`, with a CLI scaffold for
+  configuration output and planned detection workflows.
 
 Planned for v2:
 
@@ -106,7 +106,7 @@ Core components:
 | Falco | Runtime event sensor and rule engine | Planned |
 | Vector | Event routing and normalization pipeline | Config present |
 | Quickwit | Searchable event backend | Config present |
-| Python tooling | Enrichment, correlation, reporting | Minimal config package only |
+| Python tooling | Enrichment, correlation, reporting | `meridian-detect` CLI scaffold only |
 | Trivy | CI vulnerability and config scanning | Configured |
 
 The default local target should be k3s or kind. Provider-specific profiles for
@@ -123,7 +123,7 @@ MERIDIAN/
 ├── observability/            # Quickwit and event pipeline configuration
 ├── onprem/                   # Existing Compose lab from earlier iteration
 ├── security/                 # Security tooling docs and Trivy config
-├── tools/meridian-core/      # Current Python package; planned enrichment home
+├── tools/meridian-detect/    # Current Python CLI; planned enrichment home
 ├── README.md
 ├── SECURITY.md
 └── STRUCTURE.md
@@ -253,6 +253,19 @@ make compose
 make check
 ```
 
+Current CLI scaffold:
+
+```bash
+make cli-help
+meridian-detect --help
+meridian-detect config
+python3 -m meridian_detect --help
+```
+
+The `validate`, `enrich`, and `report` subcommands are placeholders for the
+future detection workflow. They intentionally return a non-zero exit code until
+real detection logic exists.
+
 Current local Trivy checks, if Trivy is installed:
 
 ```bash
@@ -263,9 +276,9 @@ make trivy-config
 Equivalent direct Python commands:
 
 ```bash
-python3 -m pytest tools/meridian-core/tests
-python3 -m ruff check tools/meridian-core
-python3 -m mypy tools/meridian-core/src
+python3 -m pytest tools/meridian-detect/tests
+python3 -m ruff check tools/meridian-detect
+python3 -m mypy tools/meridian-detect/src
 ```
 
 The Compose lab is not the final MERIDIAN v2 runtime architecture.
@@ -276,12 +289,12 @@ The Compose lab is not the final MERIDIAN v2 runtime architecture.
 
 Near term:
 
-- rewrite `security/README.md` around local detection ownership
 - add Falco rule directory
 - add sample Falco JSON events
 - define detection catalog schema
 - add MITRE ATT&CK mapping
 - build Python event enrichment/report output
+- replace CLI placeholders with validation, enrichment, and report logic
 
 Later:
 

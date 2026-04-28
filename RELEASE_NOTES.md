@@ -18,7 +18,7 @@ detection engineering project.
 - Kept existing Quickwit, Vector, Trivy, and Python quality checks as useful v2
   building blocks.
 - Clarified that Falco rules, synthetic tests, MITRE mapping, and enrichment are
-  planned v2 work, not currently implemented on main.
+  planned v2 work, not currently implemented.
 
 ## Current Baseline
 
@@ -30,9 +30,10 @@ Currently configured:
 - Quickwit configuration.
 - Vector and Fluent Bit configuration.
 - Legacy Docker Compose lab.
-- Minimal `meridian-core` diagnostics package.
+- Minimal `meridian-detect` CLI scaffold for configuration output and planned
+  detection workflow commands.
 
-Not currently implemented on main:
+Not currently implemented:
 
 - Falco runtime rules.
 - Kubernetes deployment profile.
