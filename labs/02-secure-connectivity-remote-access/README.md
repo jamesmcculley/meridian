@@ -1,5 +1,9 @@
 # Secure Connectivity & Remote Access
 
+> Platform note: this file is retained as guided-lab context. Future
+> architecture-driven connectivity contracts belong in
+> `network-security/connectivity/`.
+
 ## Problem
 
 Branch offices need reliable access to HQ services without turning the network

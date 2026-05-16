@@ -1,5 +1,8 @@
 # Interview Positioning
 
+> Development note: this document is retained as positioning context. It is not
+> the platform architecture source of truth.
+
 MERIDIAN LABS is designed to be discussed as a practical security engineering
 project, not as a finished product. The strongest signal is the decision trail:
 what was modeled, what was intentionally simplified, what was validated, and

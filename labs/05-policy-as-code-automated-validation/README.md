@@ -1,5 +1,9 @@
 # Policy as Code & Automated Validation
 
+> Platform note: this file is retained as guided-lab context. Future automated
+> validation contracts should attach to the relevant platform domain and shared
+> checks under `core-platform/validation/`.
+
 ## Problem
 
 Security configuration can drift through well-intentioned changes, rushed

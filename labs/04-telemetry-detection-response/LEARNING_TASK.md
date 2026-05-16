@@ -1,5 +1,9 @@
 # Learning Task: Telemetry, Detection & Response
 
+> Development note: this guided task is retained for implementation practice.
+> It is not the platform architecture source of truth. Start from
+> `observability/schemas/` and `detection-engineering/` for current contracts.
+
 ## Goal
 
 Build the first local telemetry parser, correlator, or detection report for the

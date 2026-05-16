@@ -1,5 +1,10 @@
 # Roadmap
 
+> Development note: this roadmap is retained as phased planning context. The
+> current platform module boundaries are defined by top-level architecture-driven
+> domains such as `core-platform/`, `network-security/`, and
+> `detection-engineering/`.
+
 MERIDIAN LABS should progress in phases. Each phase should produce a small,
 reviewable artifact with validation evidence before the next phase grows the
 implementation.

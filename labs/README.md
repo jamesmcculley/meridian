@@ -1,5 +1,10 @@
 # MERIDIAN LABS Modules
 
+> Platform note: `labs/` is retained as legacy/current guided-lab content during
+> the MERIDIAN LABS reframe. Architecture-driven platform contracts now belong
+> in top-level domains such as `core-platform/`, `network-security/`,
+> `detection-engineering/`, and `incident-response/`.
+
 The lab modules are organized around real security engineering problems in a
 distributed office environment. Each module starts with a README and guided
 learning task before implementation is added.

@@ -1,5 +1,9 @@
 # Network Segmentation & Trust Boundaries Flow Table
 
+> Platform note: this original flow table is preserved for compatibility and
+> history. The structured platform contract is
+> `network-security/segmentation/flows.yaml`.
+
 This document defines the first intended segmentation behavior for MERIDIAN
 LABS. It is design intent only. No firewall, Docker network, VPN, or routing
 implementation exists in this lab yet.

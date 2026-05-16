@@ -1,5 +1,9 @@
 # Learning Task: Policy as Code & Automated Validation
 
+> Development note: this guided task is retained for implementation practice.
+> It is not the platform architecture source of truth. Shared validation
+> direction starts in `core-platform/validation/`.
+
 ## Goal
 
 Implement the first lightweight policy check for MERIDIAN LABS.

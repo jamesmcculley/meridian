@@ -1,5 +1,9 @@
 # Telemetry, Detection & Response
 
+> Platform note: this file is retained as guided-lab context. Future telemetry
+> schema contracts belong in `observability/schemas/`, and detection content
+> belongs in `detection-engineering/`.
+
 ## Problem
 
 Security controls are difficult to trust if they do not produce useful evidence.

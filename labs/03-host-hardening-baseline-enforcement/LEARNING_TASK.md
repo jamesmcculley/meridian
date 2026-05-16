@@ -1,5 +1,8 @@
 # Learning Task: Host Hardening & Baseline Enforcement
 
+> Development note: this guided task is retained for implementation practice.
+> It is not the platform architecture source of truth.
+
 ## Goal
 
 Create the first baseline host or service hardening implementation for the lab.

@@ -1,5 +1,9 @@
 # Learning Task: Network Segmentation & Trust Boundaries
 
+> Development note: this guided task is retained for implementation practice.
+> It is not the platform architecture source of truth. Start from
+> `network-security/segmentation/` for current segmentation contracts.
+
 ## Goal
 
 Implement the first local segmentation control path for the distributed office

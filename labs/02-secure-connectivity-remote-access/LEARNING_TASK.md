@@ -1,5 +1,9 @@
 # Learning Task: Secure Connectivity & Remote Access
 
+> Development note: this guided task is retained for implementation practice.
+> It is not the platform architecture source of truth. Future connectivity
+> contracts belong in `network-security/connectivity/`.
+
 ## Goal
 
 Implement the first secure branch-to-HQ connectivity path without weakening the

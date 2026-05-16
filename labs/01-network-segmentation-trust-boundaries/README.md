@@ -1,5 +1,9 @@
 # Network Segmentation & Trust Boundaries
 
+> Platform note: this file is retained as guided-lab context. The structured
+> platform contract for segmentation now starts in
+> `network-security/segmentation/flows.yaml`.
+
 ## Problem
 
 Small offices often grow faster than their network controls. Employee devices,

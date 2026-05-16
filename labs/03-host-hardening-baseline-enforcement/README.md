@@ -1,5 +1,10 @@
 # Host Hardening & Baseline Enforcement
 
+> Platform note: this file is retained as guided-lab context. Future
+> architecture-driven baseline contracts should live under the relevant platform
+> domain, such as `core-platform/`, `container-platform/`, or
+> `identity-access/`.
+
 ## Problem
 
 Branch and HQ systems often drift from secure defaults as services are added,
